@@ -78,7 +78,7 @@ namespace protodumplib
 
         IEnumerator IEnumerable.GetEnumerator() => _fields.Values.GetEnumerator();
 
-        public void Serialize(Codec codec)
+        public void Serialize(DumpCodec codec)
         {
             foreach (var field in this)
                 codec.WriteField(field);

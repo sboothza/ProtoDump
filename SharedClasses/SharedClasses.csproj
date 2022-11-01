@@ -9,4 +9,14 @@
   <ItemGroup>
     <ProjectReference Include="..\protodumplib\protodumplib.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="gen\" />
+    <None Remove="Google.Protobuf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="gen\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.21.9" />
+  </ItemGroup>
 </Project>

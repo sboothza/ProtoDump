@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace protodump
 {
-    public class Codec
+    public class DumpCodec
     {
         private byte[] _data;
         private int _position = 0;
@@ -34,12 +34,12 @@ namespace protodump
             _data = newData;
         }
 
-        public Codec(int size = 1024)
+        public DumpCodec(int size = 1024)
         {
             Init(size);
         }
 
-        public Codec(byte[] data) => Init(data);
+        public DumpCodec(byte[] data) => Init(data);
 
         public void Seek(int position) => _position = position;
 
@@ -61,13 +61,17 @@ namespace protodump
 
         private void Write<T>(T value)
         {
+            var size = Marshal.SizeOf(typeof(T));
+            while (_position + size > _data.Length)
+                DoubleSize();
+
             unsafe
             {
                 fixed (byte* ptr = &(_data[_position]))
                 {
                     Unsafe.Write<T>(ptr, value);
                 }
-                _position += Marshal.SizeOf(typeof(T));
+                _position += size;
             }
         }
 

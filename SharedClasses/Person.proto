@@ -1,1 +1,10 @@
-﻿
+﻿syntax = "proto3";
+
+message PersonProto {
+    string Name = 1;
+    string Surname = 2;
+    int32 Id = 3;
+    int64 Birthdate = 4;
+    string Address = 5;
+
+}
