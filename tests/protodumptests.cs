@@ -53,12 +53,16 @@ public class Tests
         codec = new DumpCodec(data);
         var p = new Person();
         codec.ReadObject(p);
-        
-        Assert.That(p.Name, Is.EqualTo(person.Name));
-        Assert.That(p.Surname, Is.EqualTo(person.Surname));
-        Assert.That(p.Id, Is.EqualTo(person.Id));
-        Assert.That(p.Birthdate, Is.EqualTo(person.Birthdate));
-        Assert.That(p.Address, Is.EqualTo(person.Address));
+        Assert.Multiple(() =>
+        {
+            Assert.That(p.Name, Is.EqualTo(person.Name));
+            Assert.That(p.Surname, Is.EqualTo(person.Surname));
+            Assert.That(p.Id, Is.EqualTo(person.Id));
+            Assert.That(p.Birthdate, Is.EqualTo(person.Birthdate));
+            Assert.That(p.Address, Is.EqualTo(person.Address));            
+            Assert.That(p.Name, Is.Not.Empty);
+            Assert.That(p.Address, Is.Not.Empty);
+        });
     }
 
     [Test]
@@ -79,12 +83,14 @@ public class Tests
         codec = new DumpCodec(data);
         var p = new Person_v2();
         codec.ReadObject(p);
+        Console.WriteLine(p.Address.Street);
         Assert.Multiple(() =>
         {
             Assert.That(p.Name, Is.EqualTo(person.Name));
             Assert.That(p.Surname, Is.EqualTo(person.Surname));
             Assert.That(p.Id, Is.EqualTo(person.Id));
             Assert.That(p.Birthdate, Is.EqualTo(person.Birthdate));
+            Assert.That(p.Name, Is.Not.Empty);
         });
     }
 
@@ -112,6 +118,8 @@ public class Tests
             Assert.That(p.Surname, Is.EqualTo(person.Surname));
             Assert.That(p.Id, Is.EqualTo(person.Id));
             Assert.That(p.Birthdate, Is.EqualTo(person.Birthdate));
+            Assert.That(p.Name, Is.Not.Empty);
+            Assert.That(p.Address.Street, Is.Not.Empty);
         });
     }
 
@@ -141,6 +149,8 @@ public class Tests
             Assert.That(p.Id, Is.EqualTo(person.Id));
             Assert.That(p.Birthdate, Is.EqualTo(person.Birthdate));
             Assert.That(p.Address.Street, Is.EqualTo(person.Address.Street));
+            Assert.That(p.Name, Is.Not.Empty);
+            Assert.That(p.Address.Street, Is.Not.Empty);
         });
     }
 
@@ -170,6 +180,8 @@ public class Tests
             Assert.That(p.Id, Is.EqualTo(person.Id));
             Assert.That(p.Birthdate, Is.EqualTo(person.Birthdate));
             Assert.That(p.Address, Is.EqualTo(person.Address));
+            Assert.That(p.Name, Is.Not.Empty);
+            Assert.That(p.Address, Is.Not.Empty);
         });
     }
 
@@ -197,6 +209,8 @@ public class Tests
             Assert.That(p.Id, Is.EqualTo(person.Id));
             Assert.That(p.Birthdate, Is.EqualTo(person.Birthdate));
             Assert.That(p.Address.Street, Is.EqualTo(person.Address.Street));
+            Assert.That(p.Name, Is.Not.Empty);
+            Assert.That(p.Address.Street, Is.Not.Empty);
         });
     }
 

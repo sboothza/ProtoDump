@@ -8,7 +8,7 @@ namespace tests
     [TestFixture]
     public class PerformanceTests
     {
-        private static int LOOPS = 100000;
+        private static readonly int LOOPS = 100000;
         [Test]
         public void TestSerializePerformance()
         {

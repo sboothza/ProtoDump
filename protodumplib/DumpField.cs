@@ -4,22 +4,6 @@ using protodump;
 
 namespace protodumplib
 {
-    //public struct DumpField
-    //{
-    //    public byte FieldNo { get; set; }
-    //    public DumpType FieldType { get; set; }
-
-    //    public DumpField(byte fieldNo)
-    //    {            
-    //        FieldNo = fieldNo;
-    //        FieldType = DumpType.Unknown;
-    //    }
-
-    //    public string GetAsString() => string.Empty;
-
-    //    public override string ToString() => $"{FieldNo}:{FieldType}:{GetAsString()}";
-    //}
-
     public interface IDumpField
     {
         byte FieldNo { get; set; }
@@ -42,7 +26,7 @@ namespace protodumplib
         public override string ToString() => $"{FieldNo}:{FieldType}:{Value}";
     }
 
-    public class DumpFieldByte : IDumpField
+    public struct DumpFieldByte : IDumpField
     {
         public byte FieldNo { get; set; }
         public DumpType FieldType { get; set; }
@@ -57,7 +41,7 @@ namespace protodumplib
         public override string ToString() => $"{FieldNo}:{FieldType}:{Value}";
     }
 
-    public class DumpFieldInt : IDumpField
+    public struct DumpFieldInt : IDumpField
     {
         public byte FieldNo { get; set; }
         public DumpType FieldType { get; set; }
@@ -72,7 +56,7 @@ namespace protodumplib
         public override string ToString() => $"{FieldNo}:{FieldType}:{Value}";
     }
 
-    public class DumpFieldLong : IDumpField
+    public struct DumpFieldLong : IDumpField
     {
         public byte FieldNo { get; set; }
         public DumpType FieldType { get; set; }
@@ -87,7 +71,7 @@ namespace protodumplib
         public override string ToString() => $"{FieldNo}:{FieldType}:{Value}";
     }
 
-    public class DumpFieldString : IDumpField
+    public struct DumpFieldString : IDumpField
     {
         public byte FieldNo { get; set; }
         public DumpType FieldType { get; set; }
@@ -102,7 +86,7 @@ namespace protodumplib
         public override string ToString() => $"{FieldNo}:{FieldType}:{Value}";
     }
 
-    public class DumpFieldObject : IDumpField
+    public struct DumpFieldObject : IDumpField
     {
         public byte FieldNo { get; set; }
         public DumpType FieldType { get; set; }
@@ -143,6 +127,8 @@ namespace protodumplib
 
         public void LoadFrom(DumpObject obj)
         {
+            if (obj is null)
+                return;
             foreach (var fieldObj in obj.Fields)
                 _fields[fieldObj.Key] = fieldObj.Value;
         }
