@@ -1,38 +1,31 @@
 ﻿using System;
-using System.Xml.Linq;
+using System.Net;
 using protodump;
+
 
 namespace protodumplib
 {
-    public class Address : DumpObject
+    public class Address : Dumpable
     {
-        public string Street
+        public string Street { get; set; }
+        public string Suburb { get; set; }
+        public string City { get; set; }
+        public string Code { get; set; }
+
+        public override void Deserialize(DumpObject obj)
         {
-            get => Fields.ContainsKey(1) ? ((DumpFieldString)Fields[1]).Value : string.Empty;
-            set => Fields[1] = new DumpFieldString(1, value);
-        }
-        public string Suburb
-        {
-            get => Fields.ContainsKey(2) ? ((DumpFieldString)Fields[2]).Value : string.Empty;
-            set => Fields[2] = new DumpFieldString(2, value);
-        }
-        public string City
-        {
-            get => Fields.ContainsKey(3) ? ((DumpFieldString)Fields[3]).Value : string.Empty;
-            set => Fields[3] = new DumpFieldString(3, value);
-        }
-        public string Code
-        {
-            get => Fields.ContainsKey(4) ? ((DumpFieldString)Fields[4]).Value : string.Empty;
-            set => Fields[4] = new DumpFieldString(4, value);
+            Street = obj.Fields.ContainsKey(1) ? ((DumpFieldString)obj.Fields[1]).Value : string.Empty;
+            Suburb = obj.Fields.ContainsKey(2) ? ((DumpFieldString)obj.Fields[2]).Value : string.Empty;
+            City = obj.Fields.ContainsKey(3) ? ((DumpFieldString)obj.Fields[3]).Value : string.Empty;
+            Code = obj.Fields.ContainsKey(4) ? ((DumpFieldString)obj.Fields[4]).Value : string.Empty;
         }
 
-        public Address()
+        public override void Serialize(DumpObject obj)
         {
-            //AddField(new DumpFieldString(1, String.Empty));
-            //AddField(new DumpFieldString(2, String.Empty));
-            //AddField(new DumpFieldString(3, String.Empty));
-            //AddField(new DumpFieldString(4, String.Empty));
+            obj.Fields[1] = new DumpFieldString(1, Street);
+            obj.Fields[2] = new DumpFieldString(2, Suburb);
+            obj.Fields[3] = new DumpFieldString(3, City);
+            obj.Fields[4] = new DumpFieldString(4, Code);
         }
 
         public override string ToString()
@@ -43,21 +36,29 @@ namespace protodumplib
 
     public class Person_v2 : Person
     {
-        private Address _address;
-        public new Address Address
+        public new Address Address { get; set; }
+
+        public Person_v2()
         {
-            get
-            {
-                _address ??= new Address();
-                if (Fields.ContainsKey(6))
-                    _address.LoadFrom(((DumpFieldObject)Fields[6]).Value);
-                return _address;
-            }
-            set => Fields[6] = new DumpFieldObject(6, value);
+            Address = new Address();
         }
-        public Person_v2() : base()
+
+        public override void Deserialize(DumpObject obj)
         {
-            AddField(new DumpFieldObject(6, null));
+            base.Deserialize(obj);
+            if (obj.Fields.ContainsKey(6))
+            {
+                var addr = ((DumpFieldObject)obj.Fields[6]).Value;
+                Address.Deserialize(addr);
+            }     
+        }
+
+        public override void Serialize(DumpObject obj)
+        {
+            base.Serialize(obj);
+            var address = new DumpObject();
+            Address.Serialize(address);
+            obj.Fields[6] = new DumpFieldObject(6, address);
         }
     }
 }

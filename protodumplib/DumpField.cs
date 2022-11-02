@@ -132,6 +132,20 @@ namespace protodumplib
             foreach (var fieldObj in obj.Fields)
                 _fields[fieldObj.Key] = fieldObj.Value;
         }
+
+        public void LoadTo(DumpObject obj)
+        {
+            if (obj is null)
+                return;
+            foreach (var fieldObj in obj.Fields)
+                _fields[fieldObj.Key] = fieldObj.Value;
+        }
+    }
+
+    public abstract class Dumpable
+    {
+        public abstract void Serialize(DumpObject obj);
+        public abstract void Deserialize(DumpObject obj);
     }
 }
 

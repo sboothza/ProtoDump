@@ -51,7 +51,7 @@ namespace tests
             {
                 var p = new Person_v2();
                 codec.Init(data);
-                codec.ReadObject(p);
+                codec.Deserialize(p);
             }
             var spent = DateTime.Now - start;
             Console.WriteLine($"TestDeSerializePerformance: {spent.TotalMilliseconds:0#} Size:{data.Length}");

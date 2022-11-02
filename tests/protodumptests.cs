@@ -48,11 +48,11 @@ public class Tests
         };
 
         var codec = new DumpCodec();
-        var data = codec.Serialize((DumpObject)person);
+        var data = codec.Serialize(person);
 
         codec = new DumpCodec(data);
         var p = new Person();
-        codec.ReadObject(p);
+        codec.Deserialize(p);
         Assert.Multiple(() =>
         {
             Assert.That(p.Name, Is.EqualTo(person.Name));
@@ -78,11 +78,11 @@ public class Tests
         };
 
         var codec = new DumpCodec();
-        var data = codec.Serialize((DumpObject)person);
+        var data = codec.Serialize(person);
 
         codec = new DumpCodec(data);
         var p = new Person_v2();
-        codec.ReadObject(p);
+        codec.Deserialize(p);
         Console.WriteLine(p.Address.Street);
         Assert.Multiple(() =>
         {
@@ -111,7 +111,7 @@ public class Tests
 
         codec = new DumpCodec(data);
         var p = new Person_v2();
-        codec.ReadObject(p);
+        codec.Deserialize(p);
         Assert.Multiple(() =>
         {
             Assert.That(p.Name, Is.EqualTo(person.Name));
@@ -140,7 +140,7 @@ public class Tests
 
         codec = new DumpCodec(data);
         var p = new Person_v2();
-        codec.ReadObject(p);
+        codec.Deserialize(p);
         Console.WriteLine($"Size: {data.Length}");
         Assert.Multiple(() =>
         {

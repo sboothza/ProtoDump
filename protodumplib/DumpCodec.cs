@@ -62,6 +62,15 @@ namespace protodump
             return GetData();
         }
 
+        public byte[] Serialize(Dumpable obj)
+        {
+            Init();
+            var dumpObject = new DumpObject();
+            obj.Serialize(dumpObject);
+            dumpObject.Serialize(this);
+            return GetData();
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteDouble(double value)
         {
@@ -294,6 +303,13 @@ namespace protodump
                 obj.AddField(field);
                 field = ReadField();
             }
+        }
+
+        public void Deserialize(Dumpable obj)
+        {
+            var dumpObj = new DumpObject();
+            ReadObject(dumpObj);
+            obj.Deserialize(dumpObj);
         }
     }
 }
