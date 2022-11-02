@@ -33,12 +33,14 @@ namespace protodump
 
         public Person()
         {
-            Fields[1] = new DumpField<string>(1);
-            Fields[2] = new DumpField<string>(2);
-            Fields[3] = new DumpField<int>(3);
-            Fields[4] = new DumpField<DateTime>(4);
-            Fields[5] = new DumpField<string>(5);
+            AddField(new DumpField<string>(1));
+            AddField(new DumpField<string>(2));
+            AddField(new DumpField<int>(3));
+            AddField(new DumpField<DateTime>(4));
+            AddField(new DumpField<string>(5));
         }
     }
+
+  
 }
 

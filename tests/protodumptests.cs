@@ -139,6 +139,7 @@ public class Tests
         codec = new DumpCodec(data);
         var p = new Person_v2();
         codec.ReadObject(p);
+        Console.WriteLine($"Size: {data.Length}");
         Assert.Multiple(() =>
         {
             Assert.That(p.Name, Is.EqualTo(person.Name));

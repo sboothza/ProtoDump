@@ -8,6 +8,7 @@ namespace tests
     [TestFixture]
     public class PerformanceTests
     {
+        private static int LOOPS = 100000;
         [Test]
         public void TestSerializePerformance()
         {
@@ -22,13 +23,13 @@ namespace tests
 
             var codec = new DumpCodec();
             var start = DateTime.Now;
-            for (var i = 0; i < 1000; i++)
+            byte[] data = null;
+            for (var i = 0; i < LOOPS; i++)
             {
-                var data = codec.Serialize(person);
+                data = codec.Serialize(person);
             }
             var spent = DateTime.Now - start;
-            Console.WriteLine("TestSerializePerformance");
-            Console.WriteLine(spent.TotalMilliseconds);
+            Console.WriteLine($"TestSerializePerformance: {spent.TotalMilliseconds:0#} Size:{data.Length}");
         }
 
         [Test]
@@ -44,16 +45,16 @@ namespace tests
             };
 
             var codec = new DumpCodec();
+            var data = codec.Serialize(person);
             var start = DateTime.Now;
-            for (var i = 0; i < 1000; i++)
+            for (var i = 0; i < LOOPS; i++)
             {
                 var p = new Person_v2();
-                codec.Seek(0);
+                codec.Init(data);
                 codec.ReadObject(p);
             }
             var spent = DateTime.Now - start;
-            Console.WriteLine("TestDeSerializePerformance");
-            Console.WriteLine(spent.TotalMilliseconds);
+            Console.WriteLine($"TestDeSerializePerformance: {spent.TotalMilliseconds:0#} Size:{data.Length}");
         }
 
         [Test]
@@ -69,16 +70,17 @@ namespace tests
             };
 
             var stream = new MemoryStream(1024);
-
+            byte[] data = null;
             var start = DateTime.Now;
-            for (var i = 0; i < 1000; i++)
+            for (var i = 0; i < LOOPS; i++)
             {
                 stream.Seek(0, SeekOrigin.Begin);
                 person.WriteTo(stream);
+                data = new byte[stream.Length];
+                stream.Read(data, 0, (int)stream.Length);
             }
             var spent = DateTime.Now - start;
-            Console.WriteLine("TestProtoSerializePerformance");
-            Console.WriteLine(spent.TotalMilliseconds);
+            Console.WriteLine($"TestProtoSerializePerformance: {spent.TotalMilliseconds:0#} Size:{data.Length}");
         }
 
         [Test]
@@ -95,16 +97,20 @@ namespace tests
 
             var stream = new MemoryStream(1024);
             person.WriteTo(stream);
+            var data = new byte[stream.Length];
+            stream.Seek(0, SeekOrigin.Begin);
+            stream.Read(data, 0, (int)stream.Length);            
 
             var start = DateTime.Now;
-            for (var i = 0; i < 1000; i++)
+            for (var i = 0; i < LOOPS; i++)
             {
+                stream.Seek(0, SeekOrigin.Begin);
+                stream.Write(data, 0, data.Length);
                 stream.Seek(0, SeekOrigin.Begin);
                 PersonProto_v2 p = PersonProto_v2.Parser.ParseFrom(stream);
             }
             var spent = DateTime.Now - start;
-            Console.WriteLine("TestProtoDeSerializePerformance");
-            Console.WriteLine(spent.TotalMilliseconds);
+            Console.WriteLine($"TestProtoDeSerializePerformance: {spent.TotalMilliseconds:0#} Size:{data.Length}");
         }
     }
 }

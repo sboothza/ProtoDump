@@ -29,10 +29,10 @@ namespace protodumplib
 
         public Address()
         {
-            Fields[1] = new DumpField<string>(1);
-            Fields[2] = new DumpField<string>(2);
-            Fields[3] = new DumpField<string>(3);
-            Fields[4] = new DumpField<string>(4);
+            AddField(new DumpField<string>(1));
+            AddField(new DumpField<string>(2));
+            AddField(new DumpField<string>(3));
+            AddField(new DumpField<string>(4));
         }
 
         public override string ToString()
@@ -59,7 +59,7 @@ namespace protodumplib
         }
         public Person_v2() : base()
         {
-            Fields[6] = new DumpField<DumpObject>(6);
+            AddField(new DumpField<DumpObject>(6));
         }
     }
 }

@@ -6,15 +6,17 @@ using protodumplib;
 using System.Xml.Linq;
 using Microsoft.VisualBasic.FileIO;
 using System.Reflection;
+using System.Drawing;
 
 namespace protodump
 {
     public class DumpCodec
     {
+        private const int INIT_SIZE = 128;
         private byte[] _data;
         private int _position = 0;
 
-        private void Init(int size = 1024)
+        private void Init(int size = INIT_SIZE)
         {
             _data = new byte[size];
             _position = 0;
@@ -29,12 +31,13 @@ namespace protodump
 
         private void DoubleSize()
         {
+            Console.WriteLine("doubling");
             byte[] newData = new byte[_data.Length * 2];
             Array.Copy(_data, newData, _data.Length);
             _data = newData;
         }
 
-        public DumpCodec(int size = 1024)
+        public DumpCodec(int size = INIT_SIZE)
         {
             Init(size);
         }
@@ -59,9 +62,25 @@ namespace protodump
             return GetData();
         }
 
-        private void Write<T>(T value)
+        /* private void Write<T>(T value)
+         {
+             var size = Marshal.SizeOf(typeof(T));
+             while (_position + size > _data.Length)
+                 DoubleSize();
+
+             unsafe
+             {
+                 fixed (byte* ptr = &(_data[_position]))
+                 {
+                     Unsafe.Write<T>(ptr, value);
+                 }
+                 _position += size;
+             }
+         }*/
+
+        public void WriteDouble(double value)
         {
-            var size = Marshal.SizeOf(typeof(T));
+            const int size = 8;
             while (_position + size > _data.Length)
                 DoubleSize();
 
@@ -69,45 +88,89 @@ namespace protodump
             {
                 fixed (byte* ptr = &(_data[_position]))
                 {
-                    Unsafe.Write<T>(ptr, value);
+                    Unsafe.Write(ptr, value);
                 }
                 _position += size;
             }
         }
 
-        public void WriteDouble(double value) => Write<double>(value);
+        public void WriteByte(byte value)
+        {
+            const int size = 1;
+            while (_position + size > _data.Length)
+                DoubleSize();
 
-        public void WriteByte(byte value) => Write<byte>(value);
+            unsafe
+            {
+                fixed (byte* ptr = &(_data[_position]))
+                {
+                    Unsafe.Write(ptr, value);
+                }
+                _position += size;
+            }
+        }
 
-        public void WriteInt(int value) => Write<int>(value);
+        public void WriteInt(int value)
+        {
+            const int size = 4;
+            while (_position + size > _data.Length)
+                DoubleSize();
 
-        public void WriteLong(long value) => Write<long>(value);
+            unsafe
+            {
+                fixed (byte* ptr = &(_data[_position]))
+                {
+                    Unsafe.Write(ptr, value);
+                }
+                _position += size;
+            }
+        }
+
+        public void WriteLong(long value)
+        {
+            const int size = 8;
+            while (_position + size > _data.Length)
+                DoubleSize();
+
+            unsafe
+            {
+                fixed (byte* ptr = &(_data[_position]))
+                {
+                    Unsafe.Write(ptr, value);
+                }
+                _position += size;
+            }
+        }
 
         public void WriteString(string value)
         {
             if (string.IsNullOrEmpty(value))
                 value = string.Empty;
+
             var data = Encoding.ASCII.GetBytes(value);
-            Write<byte>((byte)data.Length);
+
+            while (_position + data.Length + 1 > _data.Length)
+                DoubleSize();
+
+            WriteByte((byte)data.Length);
             Array.Copy(data, 0, _data, _position, data.Length);
             _position += data.Length;
         }
 
-        public void WriteDate(DateTime value) => Write<long>(value.Ticks);
+        public void WriteDate(DateTime value) => WriteLong(value.Ticks);
 
         public void WriteObject(DumpObject obj) => obj.Serialize(this);
 
         public void WriteField(IDumpField field)
         {
-            Write<byte>(field.FieldNo);
-            Write<byte>((byte)field.FieldType);
+            WriteByte(field.FieldNo);
+            WriteByte((byte)field.FieldType);
             switch (field.FieldType)
             {
                 case DumpType.Double: WriteDouble(field.GetValue<double>()); break;
                 case DumpType.Byte: WriteByte(field.GetValue<byte>()); break;
                 case DumpType.Int: WriteInt(field.GetValue<int>()); break;
                 case DumpType.Long: WriteLong(field.GetValue<long>()); break;
-                case DumpType.Date: WriteDate(field.GetValue<DateTime>()); break;
                 case DumpType.String: WriteString(field.GetValue<string>()); break;
                 case DumpType.Object: WriteObject(field.GetObject()); break;
             }
@@ -115,22 +178,26 @@ namespace protodump
 
         public void WriteEnd()
         {
-            Write<byte>(0xff);
+            WriteByte(0xff);
         }
 
-        private T Read<T>()
-        {
-            unsafe
-            {
-                T value;
-                fixed (byte* ptr = &(_data[_position]))
-                {
-                    value = Unsafe.Read<T>(ptr);
-                }
-                _position += Marshal.SizeOf(typeof(T));
-                return value;
-            }
-        }
+        //private T Read<T>()
+        //{
+        //    var size = Marshal.SizeOf(typeof(T));
+        //    if (_position + size > _data.Length)
+        //        throw new OverflowException("Not enough data left to read");
+
+        //    unsafe
+        //    {
+        //        T value;
+        //        fixed (byte* ptr = &(_data[_position]))
+        //        {
+        //            value = Unsafe.Read<T>(ptr);
+        //        }
+        //        _position += size;
+        //        return value;
+        //    }
+        //}
 
         private IDumpField ReadField()
         {
@@ -147,30 +214,96 @@ namespace protodump
                 case DumpType.Int: field = new DumpField<int>(fieldNo) { Value = ReadInt() }; break;
                 case DumpType.Long: field = new DumpField<long>(fieldNo) { Value = ReadLong() }; break;
                 case DumpType.String: field = new DumpField<string>(fieldNo) { Value = ReadString() }; break;
-                case DumpType.Date: field = new DumpField<DateTime>(fieldNo) { Value = ReadDate() }; break;
                 case DumpType.Object: field = new DumpField<DumpObject>(fieldNo) { Value = ReadObject() }; break;
             }
             return field;
         }
 
-        public double ReadDouble() => Read<double>();
+        public double ReadDouble()
+        {
+            const int size = 8;
+            if (_position + size > _data.Length)
+                throw new OverflowException("Not enough data left to read");
 
-        public byte ReadByte() => Read<byte>();
+            unsafe
+            {
+                double value;
+                fixed (byte* ptr = &(_data[_position]))
+                {
+                    value = Unsafe.Read<double>(ptr);
+                }
+                _position += size;
+                return value;
+            }
+        }
 
-        public int ReadInt() => Read<int>();
+        public byte ReadByte()
+        {
+            const int size = 1;
+            if (_position + size > _data.Length)
+                throw new OverflowException("Not enough data left to read");
 
-        public long ReadLong() => Read<long>();
+            unsafe
+            {
+                byte value;
+                fixed (byte* ptr = &(_data[_position]))
+                {
+                    value = Unsafe.Read<byte>(ptr);
+                }
+                _position += size;
+                return value;
+            }
+        }
+
+        public int ReadInt()
+        {
+            const int size = 4;
+            if (_position + size > _data.Length)
+                throw new OverflowException("Not enough data left to read");
+
+            unsafe
+            {
+                int value;
+                fixed (byte* ptr = &(_data[_position]))
+                {
+                    value = Unsafe.Read<int>(ptr);
+                }
+                _position += size;
+                return value;
+            }
+        }
+
+        public long ReadLong()
+        {
+            const int size = 8;
+            if (_position + size > _data.Length)
+                throw new OverflowException("Not enough data left to read");
+
+            unsafe
+            {
+                long value;
+                fixed (byte* ptr = &(_data[_position]))
+                {
+                    value = Unsafe.Read<long>(ptr);
+                }
+                _position += size;
+                return value;
+            }
+        }
 
         public string ReadString()
         {
-            var len = Read<byte>();
+            var len = ReadByte();
             var data = new byte[len];
+            if (_position + len > _data.Length)
+                throw new OverflowException("Not enough data to read");
+
             Array.Copy(_data, _position, data, 0, len);
             _position += len;
             return Encoding.ASCII.GetString(data);
         }
 
-        public DateTime ReadDate() => new DateTime(Read<long>());
+        public DateTime ReadDate() => new DateTime(ReadLong());
 
         public DumpObject ReadObject()
         {
