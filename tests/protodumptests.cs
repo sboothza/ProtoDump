@@ -16,7 +16,6 @@ public class Tests
         codec.WriteDouble(2);
         codec.WriteString("this is a test");
         codec.WriteInt(456);
-        codec.WriteDate(DateTime.Today);
         codec.WriteLong(-890);
 
         var buf = codec.GetData();
@@ -27,15 +26,13 @@ public class Tests
         var v2 = codec.ReadDouble();
         var v3 = codec.ReadString();
         var v4 = codec.ReadInt();
-        var v5 = codec.ReadDate();
-        var v6 = codec.ReadLong();
+        var v5 = codec.ReadLong();
 
         Assert.That(v1, Is.EqualTo(1));
         Assert.That(v2, Is.EqualTo(2));
         Assert.That(v3, Is.EqualTo("this is a test"));
         Assert.That(v4, Is.EqualTo(456));
-        Assert.That(v5, Is.EqualTo(DateTime.Today));
-        Assert.That(v6, Is.EqualTo(-890));
+        Assert.That(v5, Is.EqualTo(-890));
     }
 
     [Test]
@@ -56,8 +53,7 @@ public class Tests
         codec = new DumpCodec(data);
         var p = new Person();
         codec.ReadObject(p);
-        //var p = codec.DeSerialize<Person>(data);
-
+        
         Assert.That(p.Name, Is.EqualTo(person.Name));
         Assert.That(p.Surname, Is.EqualTo(person.Surname));
         Assert.That(p.Id, Is.EqualTo(person.Id));
@@ -85,8 +81,6 @@ public class Tests
         codec.ReadObject(p);
         Assert.Multiple(() =>
         {
-            //var p = codec.DeSerialize<Person_v2>(data);
-
             Assert.That(p.Name, Is.EqualTo(person.Name));
             Assert.That(p.Surname, Is.EqualTo(person.Surname));
             Assert.That(p.Id, Is.EqualTo(person.Id));
@@ -169,12 +163,14 @@ public class Tests
         stream.Seek(0, SeekOrigin.Begin);
 
         PersonProto p = PersonProto.Parser.ParseFrom(stream);
-
-        Assert.That(p.Name, Is.EqualTo(person.Name));
-        Assert.That(p.Surname, Is.EqualTo(person.Surname));
-        Assert.That(p.Id, Is.EqualTo(person.Id));
-        Assert.That(p.Birthdate, Is.EqualTo(person.Birthdate));
-        Assert.That(p.Address, Is.EqualTo(person.Address));
+        Assert.Multiple(() =>
+        {
+            Assert.That(p.Name, Is.EqualTo(person.Name));
+            Assert.That(p.Surname, Is.EqualTo(person.Surname));
+            Assert.That(p.Id, Is.EqualTo(person.Id));
+            Assert.That(p.Birthdate, Is.EqualTo(person.Birthdate));
+            Assert.That(p.Address, Is.EqualTo(person.Address));
+        });
     }
 
     [Test]

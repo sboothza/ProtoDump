@@ -62,22 +62,7 @@ namespace protodump
             return GetData();
         }
 
-        /* private void Write<T>(T value)
-         {
-             var size = Marshal.SizeOf(typeof(T));
-             while (_position + size > _data.Length)
-                 DoubleSize();
-
-             unsafe
-             {
-                 fixed (byte* ptr = &(_data[_position]))
-                 {
-                     Unsafe.Write<T>(ptr, value);
-                 }
-                 _position += size;
-             }
-         }*/
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteDouble(double value)
         {
             const int size = 8;
@@ -94,6 +79,7 @@ namespace protodump
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteByte(byte value)
         {
             const int size = 1;
@@ -110,6 +96,7 @@ namespace protodump
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteInt(int value)
         {
             const int size = 4;
@@ -126,6 +113,7 @@ namespace protodump
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteLong(long value)
         {
             const int size = 8;
@@ -142,6 +130,7 @@ namespace protodump
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteString(string value)
         {
             if (string.IsNullOrEmpty(value))
@@ -157,8 +146,6 @@ namespace protodump
             _position += data.Length;
         }
 
-        public void WriteDate(DateTime value) => WriteLong(value.Ticks);
-
         public void WriteObject(DumpObject obj) => obj.Serialize(this);
 
         public void WriteField(IDumpField field)
@@ -167,37 +154,21 @@ namespace protodump
             WriteByte((byte)field.FieldType);
             switch (field.FieldType)
             {
-                case DumpType.Double: WriteDouble(field.GetValue<double>()); break;
-                case DumpType.Byte: WriteByte(field.GetValue<byte>()); break;
-                case DumpType.Int: WriteInt(field.GetValue<int>()); break;
-                case DumpType.Long: WriteLong(field.GetValue<long>()); break;
-                case DumpType.String: WriteString(field.GetValue<string>()); break;
-                case DumpType.Object: WriteObject(field.GetObject()); break;
+                case DumpType.Double: WriteDouble(((DumpFieldDouble)field).Value); break;
+                case DumpType.Byte: WriteByte(((DumpFieldByte)field).Value); break;
+                case DumpType.Int: WriteInt(((DumpFieldInt)field).Value); break;
+                case DumpType.Long: WriteLong(((DumpFieldLong)field).Value); break;
+                case DumpType.String: WriteString(((DumpFieldString)field).Value); break;
+                case DumpType.Object: WriteObject(((DumpFieldObject)field).Value); break;
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteEnd()
         {
             WriteByte(0xff);
         }
 
-        //private T Read<T>()
-        //{
-        //    var size = Marshal.SizeOf(typeof(T));
-        //    if (_position + size > _data.Length)
-        //        throw new OverflowException("Not enough data left to read");
-
-        //    unsafe
-        //    {
-        //        T value;
-        //        fixed (byte* ptr = &(_data[_position]))
-        //        {
-        //            value = Unsafe.Read<T>(ptr);
-        //        }
-        //        _position += size;
-        //        return value;
-        //    }
-        //}
 
         private IDumpField ReadField()
         {
@@ -209,16 +180,17 @@ namespace protodump
             IDumpField field = null;
             switch (fieldType)
             {
-                case DumpType.Double: field = new DumpField<double>(fieldNo) { Value = ReadDouble() }; break;
-                case DumpType.Byte: field = new DumpField<byte>(fieldNo) { Value = ReadByte() }; break;
-                case DumpType.Int: field = new DumpField<int>(fieldNo) { Value = ReadInt() }; break;
-                case DumpType.Long: field = new DumpField<long>(fieldNo) { Value = ReadLong() }; break;
-                case DumpType.String: field = new DumpField<string>(fieldNo) { Value = ReadString() }; break;
-                case DumpType.Object: field = new DumpField<DumpObject>(fieldNo) { Value = ReadObject() }; break;
+                case DumpType.Double: field = new DumpFieldDouble(fieldNo, ReadDouble()); break;
+                case DumpType.Byte: field = new DumpFieldByte(fieldNo, ReadByte()); break;
+                case DumpType.Int: field = new DumpFieldInt(fieldNo, ReadInt()); break;
+                case DumpType.Long: field = new DumpFieldLong(fieldNo, ReadLong()); break;
+                case DumpType.String: field = new DumpFieldString(fieldNo, ReadString()); break;
+                case DumpType.Object: field = new DumpFieldObject(fieldNo, ReadObject()); break;
             }
             return field;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double ReadDouble()
         {
             const int size = 8;
@@ -237,6 +209,7 @@ namespace protodump
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte ReadByte()
         {
             const int size = 1;
@@ -255,6 +228,7 @@ namespace protodump
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int ReadInt()
         {
             const int size = 4;
@@ -273,6 +247,7 @@ namespace protodump
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public long ReadLong()
         {
             const int size = 8;
@@ -291,6 +266,7 @@ namespace protodump
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ReadString()
         {
             var len = ReadByte();
@@ -302,8 +278,6 @@ namespace protodump
             _position += len;
             return Encoding.ASCII.GetString(data);
         }
-
-        public DateTime ReadDate() => new DateTime(ReadLong());
 
         public DumpObject ReadObject()
         {

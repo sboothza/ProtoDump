@@ -4,143 +4,117 @@ using protodump;
 
 namespace protodumplib
 {
-    public struct TokenOf<X> : IComparable
-    {
-        public int CompareTo(object obj)
-        {
-            if (obj is TokenOf<X>)
-                return 0;
-            return 1;
-        }
-    }
+    //public struct DumpField
+    //{
+    //    public byte FieldNo { get; set; }
+    //    public DumpType FieldType { get; set; }
+
+    //    public DumpField(byte fieldNo)
+    //    {            
+    //        FieldNo = fieldNo;
+    //        FieldType = DumpType.Unknown;
+    //    }
+
+    //    public string GetAsString() => string.Empty;
+
+    //    public override string ToString() => $"{FieldNo}:{FieldType}:{GetAsString()}";
+    //}
 
     public interface IDumpField
     {
-        public byte FieldNo { get; set; }
-        public DumpType FieldType { get; set; }
-        public T GetValue<T>();
-        public DumpObject GetObject();
-        public void SetValue<T>(T value);
-        public void SetObject(DumpObject obj);
-    }
-
-    public class DumpField<T> : IDumpField
-    {
-        public DumpField(byte fieldNo)
-        {
-            Value = default(T);
-            FieldNo = fieldNo;
-            switch (default(TokenOf<T>))
-            {
-                case TokenOf<double>: FieldType = DumpType.Double; break;
-                case TokenOf<byte>: FieldType = DumpType.Byte; break;
-                case TokenOf<int>: FieldType = DumpType.Int; break;
-                case TokenOf<long>: FieldType = DumpType.Long; break;
-                case TokenOf<string>: FieldType = DumpType.String; break;
-                case TokenOf<DumpObject>: FieldType = DumpType.Object; break;
-                default: throw new InvalidCastException("Type unsupported");
-            }
-        }
-
-        public byte FieldNo { get; set; }
-        public DumpType FieldType { get; set; }
-        public T Value { get; set; }
-
-        public T1 GetValue<T1>() => (T1)Convert.ChangeType(Value, typeof(T1));
-
-        public DumpObject GetObject()
-        {
-            if (Value is DumpObject)
-                return (DumpObject)(object)Value;
-            return null;
-        }
-
-        public void SetValue<T1>(T1 value) => Value = (T)Convert.ChangeType(value, typeof(T));
-
-        public void SetObject(DumpObject obj) => Value = (T)(object)obj;
-
-        public override string ToString() => $"{FieldNo}:{FieldType}:{GetValue<string>()}";
-    }
-
-    public abstract class DumpField
-    {
-        public byte FieldNo { get; set; }
-        public DumpType FieldType { get; set; }
-
-        public DumpField(byte fieldNo)
-        {            
-            FieldNo = fieldNo;            
-        }
-
-        public abstract string GetAsString();        
-        public override string ToString() => $"{FieldNo}:{FieldType}:{GetAsString()}";
+        byte FieldNo { get; set; }
+        DumpType FieldType { get; set; }
     }
 
 
-    public class DumpFieldDouble : DumpField
+    public struct DumpFieldDouble : IDumpField
     {
-        public DumpFieldDouble(byte fieldNo) : base(fieldNo)
-        {
-            FieldType = DumpType.Double;
-        }
-
+        public byte FieldNo { get; set; }
+        public DumpType FieldType { get; set; }
         public double Value { get; set; }
-        public override string GetAsString() => Value.ToString();
-    }
-
-    public class DumpFieldByte : DumpField
-    {
-        public DumpFieldByte(byte fieldNo) : base(fieldNo)
+        public DumpFieldDouble(byte fieldNo, double value) 
         {
-            FieldType = DumpType.Byte;
+            FieldNo = fieldNo;
+            FieldType = DumpType.Double;
+            Value = value;
         }
 
+        public override string ToString() => $"{FieldNo}:{FieldType}:{Value}";
+    }
+
+    public class DumpFieldByte : IDumpField
+    {
+        public byte FieldNo { get; set; }
+        public DumpType FieldType { get; set; }
         public byte Value { get; set; }
-        public override string GetAsString() => Value.ToString();
-    }
-
-    public class DumpFieldInt : DumpField
-    {
-        public DumpFieldInt(byte fieldNo) : base(fieldNo)
+        public DumpFieldByte(byte fieldNo, byte value)
         {
-            FieldType = DumpType.Int;
+            FieldNo = fieldNo;
+            FieldType = DumpType.Byte;
+            Value = value;
         }
 
+        public override string ToString() => $"{FieldNo}:{FieldType}:{Value}";
+    }
+
+    public class DumpFieldInt : IDumpField
+    {
+        public byte FieldNo { get; set; }
+        public DumpType FieldType { get; set; }
         public int Value { get; set; }
-        public override string GetAsString() => Value.ToString();
-    }
-
-    public class DumpFieldLong : DumpField
-    {
-        public DumpFieldLong(byte fieldNo) : base(fieldNo)
+        public DumpFieldInt(byte fieldNo, int value)
         {
-            FieldType = DumpType.Long;
+            FieldNo = fieldNo;
+            FieldType = DumpType.Int;
+            Value = value;
         }
 
+        public override string ToString() => $"{FieldNo}:{FieldType}:{Value}";
+    }
+
+    public class DumpFieldLong : IDumpField
+    {
+        public byte FieldNo { get; set; }
+        public DumpType FieldType { get; set; }
         public long Value { get; set; }
-        public override string GetAsString() => Value.ToString();
-    }
-
-    public class DumpFieldString : DumpField
-    {
-        public DumpFieldString(byte fieldNo) : base(fieldNo)
+        public DumpFieldLong(byte fieldNo, long value)
         {
-            FieldType = DumpType.String;
+            FieldNo = fieldNo;
+            FieldType = DumpType.Long;
+            Value = value;
         }
 
+        public override string ToString() => $"{FieldNo}:{FieldType}:{Value}";
+    }
+
+    public class DumpFieldString : IDumpField
+    {
+        public byte FieldNo { get; set; }
+        public DumpType FieldType { get; set; }
         public string Value { get; set; }
-        public override string GetAsString() => Value;
-    }
-
-    public class DumpFieldObject : DumpField
-    {
-        public DumpFieldObject(byte fieldNo) : base(fieldNo)
+        public DumpFieldString(byte fieldNo, string value)
         {
-            FieldType = DumpType.Object;
+            FieldNo = fieldNo;
+            FieldType = DumpType.String;
+            Value = value;
         }
 
+        public override string ToString() => $"{FieldNo}:{FieldType}:{Value}";
+    }
+
+    public class DumpFieldObject : IDumpField
+    {
+        public byte FieldNo { get; set; }
+        public DumpType FieldType { get; set; }
         public DumpObject Value { get; set; }
-        public override string GetAsString() => Value.ToString();
+        public DumpFieldObject(byte fieldNo, DumpObject value)
+        {
+            FieldNo = fieldNo;
+            FieldType = DumpType.Object;
+            Value = value;
+        }
+
+        public override string ToString() => $"{FieldNo}:{FieldType}:{Value}";
     }
 
 

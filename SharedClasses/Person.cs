@@ -7,40 +7,41 @@ namespace protodump
     {
         public string Name
         {
-            get => Fields[1].GetValue<string>();
-            set => Fields[1].SetValue<string>(value);
+            get => ((DumpFieldString)Fields[1]).Value;
+            set => ((DumpFieldString)Fields[1]).Value = value;
         }
+
         public string Surname
         {
-            get => Fields[2].GetValue<string>();
-            set => Fields[2].SetValue<string>(value);
+            get => ((DumpFieldString)Fields[2]).Value;
+            set => ((DumpFieldString)Fields[2]).Value = value;
         }
         public int Id
         {
-            get => Fields[3].GetValue<int>();
-            set => Fields[3].SetValue<int>(value);
+            get => ((DumpFieldInt)Fields[3]).Value;
+            set => ((DumpFieldInt)Fields[3]).Value = value;
         }
         public DateTime Birthdate
         {
-            get => Fields[4].GetValue<DateTime>();
-            set => Fields[4].SetValue<DateTime>(value);
+            get => new DateTime(((DumpFieldLong)Fields[4]).Value);
+            set => ((DumpFieldLong)Fields[4]).Value = value.Ticks;
         }
         public string Address
         {
-            get => Fields[5].GetValue<string>();
-            set => Fields[5].SetValue<string>(value);
+            get => ((DumpFieldString)Fields[5]).Value;
+            set => ((DumpFieldString)Fields[5]).Value = value;
         }
 
         public Person()
         {
-            AddField(new DumpField<string>(1));
-            AddField(new DumpField<string>(2));
-            AddField(new DumpField<int>(3));
-            AddField(new DumpField<DateTime>(4));
-            AddField(new DumpField<string>(5));
+            AddField(new DumpFieldString(1, String.Empty));
+            AddField(new DumpFieldString(2, String.Empty));
+            AddField(new DumpFieldInt(3, 0));
+            AddField(new DumpFieldLong(4, 0));
+            AddField(new DumpFieldString(5, String.Empty));
         }
     }
 
-  
+
 }
 
