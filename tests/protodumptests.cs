@@ -29,12 +29,14 @@ public class Tests
 		var v3 = codec.ReadString();
 		var v4 = codec.ReadInt();
 		var v5 = codec.ReadLong();
-
-		Assert.That(v1, Is.EqualTo(1));
-		Assert.That(v2, Is.EqualTo(2));
-		Assert.That(v3, Is.EqualTo("this is a test"));
-		Assert.That(v4, Is.EqualTo(456));
-		Assert.That(v5, Is.EqualTo(-890));
+		Assert.Multiple(() =>
+		{
+			Assert.That(v1, Is.EqualTo(1));
+			Assert.That(v2, Is.EqualTo(2));
+			Assert.That(v3, Is.EqualTo("this is a test"));
+			Assert.That(v4, Is.EqualTo(456));
+			Assert.That(v5, Is.EqualTo(-890));
+		});
 	}
 
 	[Test]
@@ -185,7 +187,6 @@ public class Tests
 		});
 	}
 
-
 	[Test]
 	public void TestProto()
 	{
@@ -297,5 +298,4 @@ public class Tests
 			Assert.That(p.Address.Street, Is.EqualTo("24 Mountain Road"));
 		});
 	}
-
 }

@@ -12,7 +12,6 @@ namespace prototest
 		public PersonProto_v2()
 		{
 			Address = new AddressProto();
-
 		}
 
 		public override void Deserialize(DumpCodec codec, DumpField field)

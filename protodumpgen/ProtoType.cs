@@ -71,7 +71,6 @@
 						return type;
 					throw new InvalidCastException($"unknown type {type}");
 			}
-
 		}
 		public static string GetCSReader(this string type, List<Message> messages)
 		{

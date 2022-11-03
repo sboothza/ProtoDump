@@ -2,7 +2,7 @@
 
 namespace protodumpgen
 {
-	internal class Program
+	internal static class Program
 	{
 		static void Main(string[] args)
 		{
@@ -16,13 +16,11 @@ namespace protodumpgen
 			.WithParsed(o =>
 			{
 				Console.WriteLine($"Generating for {o.File} to {o.OutputFolder}");
-				if (o.Language.ToLower() == "c#")
+				if (string.Equals(o.Language, "c#", StringComparison.OrdinalIgnoreCase))
 					CSGenerator.Generate(o.File, o.OutputFolder, o.Namespace);
 				else
 					throw new Exception("unsupported language");
-
 			});
-
 		}
 	}
 }

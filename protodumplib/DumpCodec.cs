@@ -302,8 +302,10 @@ namespace protodumplib
 
 		private DumpField ReadField()
 		{
-			var field = new DumpField();
-			field.FieldNo = ReadByte();
+			var field = new DumpField
+			{
+				FieldNo = ReadByte()
+			};
 			if (field.FieldNo != 0xff)
 				field.FieldType = (DumpType)ReadByte();
 			return field;
@@ -471,7 +473,6 @@ namespace protodumplib
 			}
 		}
 
-
 		public void SkipField(DumpType fieldType)
 		{
 			switch (fieldType)
@@ -515,29 +516,7 @@ namespace protodumplib
 			var len = ReadInt();
 			var type = (DumpType)ReadByte();
 			for (var i = 0; i < len; i++)
-			{
-				switch (type)
-				{
-					case DumpType.Double:
-						ReadDouble();
-						break;
-					case DumpType.Byte:
-						ReadByte();
-						break;
-					case DumpType.Int:
-						ReadInt();
-						break;
-					case DumpType.Long:
-						ReadLong();
-						break;
-					case DumpType.String:
-						ReadString();
-						break;
-					case DumpType.Object:
-						SkipObject();
-						break;
-				}
-			}
+				SkipField(type);
 		}
 
 		public void Deserialize(Dumpable obj)
