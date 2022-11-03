@@ -1,6 +1,4 @@
-﻿using protodump;
-
-namespace protodumplib
+﻿namespace protodumplib
 {
 	public abstract class Dumpable
 	{

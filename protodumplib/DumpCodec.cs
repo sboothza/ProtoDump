@@ -1,9 +1,8 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections;
+using System.Runtime.CompilerServices;
 using System.Text;
 
-using protodumplib;
-
-namespace protodump
+namespace protodumplib
 {
 	public class DumpCodec
 	{
@@ -70,7 +69,7 @@ namespace protodump
 
 			unsafe
 			{
-				fixed (byte* ptr = &(_data[_position]))
+				fixed (byte* ptr = &_data[_position])
 				{
 					Unsafe.Write(ptr, value);
 				}
@@ -93,7 +92,7 @@ namespace protodump
 
 			unsafe
 			{
-				fixed (byte* ptr = &(_data[_position]))
+				fixed (byte* ptr = &_data[_position])
 				{
 					Unsafe.Write(ptr, value);
 				}
@@ -119,7 +118,7 @@ namespace protodump
 
 			unsafe
 			{
-				fixed (byte* ptr = &(_data[_position]))
+				fixed (byte* ptr = &_data[_position])
 				{
 					Unsafe.Write(ptr, value);
 				}
@@ -137,6 +136,32 @@ namespace protodump
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public DumpCodec WriteUInt(uint value)
+		{
+			const int size = 4;
+			while (_position + size > _data.Length)
+				DoubleSize();
+
+			unsafe
+			{
+				fixed (byte* ptr = &_data[_position])
+				{
+					Unsafe.Write(ptr, value);
+				}
+				_position += size;
+			}
+			return this;
+		}
+
+		public DumpCodec WriteUInt(byte fieldNo, uint value)
+		{
+			WriteByte(fieldNo);
+			WriteByte((byte)DumpType.UInt);
+			WriteUInt(value);
+			return this;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public DumpCodec WriteLong(long value)
 		{
 			const int size = 8;
@@ -145,7 +170,7 @@ namespace protodump
 
 			unsafe
 			{
-				fixed (byte* ptr = &(_data[_position]))
+				fixed (byte* ptr = &_data[_position])
 				{
 					Unsafe.Write(ptr, value);
 				}
@@ -159,6 +184,32 @@ namespace protodump
 			WriteByte(fieldNo);
 			WriteByte((byte)DumpType.Long);
 			WriteLong(value);
+			return this;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public DumpCodec WriteULong(ulong value)
+		{
+			const int size = 8;
+			while (_position + size > _data.Length)
+				DoubleSize();
+
+			unsafe
+			{
+				fixed (byte* ptr = &_data[_position])
+				{
+					Unsafe.Write(ptr, value);
+				}
+				_position += size;
+			}
+			return this;
+		}
+
+		public DumpCodec WriteULong(byte fieldNo, ulong value)
+		{
+			WriteByte(fieldNo);
+			WriteByte((byte)DumpType.ULong);
+			WriteULong(value);
 			return this;
 		}
 
@@ -200,6 +251,48 @@ namespace protodump
 			return this;
 		}
 
+		public DumpCodec WriteList<T>(byte fieldNo, List<T> list)
+		{
+			WriteByte(fieldNo);
+			WriteByte((byte)DumpType.List);
+			WriteInt(list.Count);
+			switch (default(TokenOf<T>))
+			{
+				case TokenOf<double>:
+					WriteByte((byte)DumpType.Double);
+					foreach (var item in list)
+						WriteDouble((double)(object)item);
+					break;
+				case TokenOf<byte>:
+					WriteByte((byte)DumpType.Byte);
+					foreach (var item in list)
+						WriteByte((byte)(object)item);
+					break;
+				case TokenOf<int>:
+					WriteByte((byte)DumpType.Int);
+					foreach (var item in list)
+						WriteInt((int)(object)item);
+					break;
+				case TokenOf<long>:
+					WriteByte((byte)DumpType.Long);
+					foreach (var item in list)
+						WriteLong((byte)(object)item);
+					break;
+				case TokenOf<string>:
+					WriteByte((byte)DumpType.String);
+					foreach (var item in list)
+						WriteString((string)(object)item);
+					break;
+				default:
+					WriteByte((byte)DumpType.Object);
+					foreach (var item in list)
+						WriteObject((Dumpable)(object)item);
+					break;
+			}
+
+			return this;
+		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public DumpCodec WriteEnd()
 		{
@@ -226,7 +319,7 @@ namespace protodump
 			unsafe
 			{
 				double value;
-				fixed (byte* ptr = &(_data[_position]))
+				fixed (byte* ptr = &_data[_position])
 				{
 					value = Unsafe.Read<double>(ptr);
 				}
@@ -245,7 +338,7 @@ namespace protodump
 			unsafe
 			{
 				byte value;
-				fixed (byte* ptr = &(_data[_position]))
+				fixed (byte* ptr = &_data[_position])
 				{
 					value = Unsafe.Read<byte>(ptr);
 				}
@@ -264,9 +357,28 @@ namespace protodump
 			unsafe
 			{
 				int value;
-				fixed (byte* ptr = &(_data[_position]))
+				fixed (byte* ptr = &_data[_position])
 				{
 					value = Unsafe.Read<int>(ptr);
+				}
+				_position += size;
+				return value;
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public uint ReadUInt()
+		{
+			const int size = 4;
+			if (_position + size > _data.Length)
+				throw new OverflowException("Not enough data left to read");
+
+			unsafe
+			{
+				uint value;
+				fixed (byte* ptr = &_data[_position])
+				{
+					value = Unsafe.Read<uint>(ptr);
 				}
 				_position += size;
 				return value;
@@ -283,9 +395,28 @@ namespace protodump
 			unsafe
 			{
 				long value;
-				fixed (byte* ptr = &(_data[_position]))
+				fixed (byte* ptr = &_data[_position])
 				{
 					value = Unsafe.Read<long>(ptr);
+				}
+				_position += size;
+				return value;
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public ulong ReadULong()
+		{
+			const int size = 8;
+			if (_position + size > _data.Length)
+				throw new OverflowException("Not enough data left to read");
+
+			unsafe
+			{
+				ulong value;
+				fixed (byte* ptr = &_data[_position])
+				{
+					value = Unsafe.Read<ulong>(ptr);
 				}
 				_position += size;
 				return value;
@@ -304,6 +435,42 @@ namespace protodump
 			_position += len;
 			return Encoding.ASCII.GetString(data);
 		}
+
+		public void ReadList<T>(IList list)
+		{
+			var len = ReadInt();
+			var type = (DumpType)ReadByte();
+			for (var i = 0; i < len; i++)
+			{
+				switch (type)
+				{
+					case DumpType.Double:
+						list.Add(ReadDouble());
+						break;
+					case DumpType.Byte:
+						list.Add(ReadByte());
+						break;
+					case DumpType.Int:
+						list.Add(ReadInt());
+						break;
+					case DumpType.Long:
+						list.Add(ReadLong());
+						break;
+					case DumpType.String:
+						list.Add(ReadString());
+						break;
+					case DumpType.Object:
+						if (typeof(T).IsSubclassOf(typeof(Dumpable)))
+						{
+							Dumpable obj = (Dumpable)Activator.CreateInstance(typeof(T));
+							Deserialize(obj);
+							list.Add(obj);
+						}
+						break;
+				}
+			}
+		}
+
 
 		public void SkipField(DumpType fieldType)
 		{
@@ -327,6 +494,9 @@ namespace protodump
 				case DumpType.Object:
 					SkipObject();
 					break;
+				case DumpType.List:
+					SkipList();
+					break;
 			}
 		}
 
@@ -337,6 +507,36 @@ namespace protodump
 			{
 				SkipField(field.FieldType);
 				field = ReadField();
+			}
+		}
+
+		public void SkipList()
+		{
+			var len = ReadInt();
+			var type = (DumpType)ReadByte();
+			for (var i = 0; i < len; i++)
+			{
+				switch (type)
+				{
+					case DumpType.Double:
+						ReadDouble();
+						break;
+					case DumpType.Byte:
+						ReadByte();
+						break;
+					case DumpType.Int:
+						ReadInt();
+						break;
+					case DumpType.Long:
+						ReadLong();
+						break;
+					case DumpType.String:
+						ReadString();
+						break;
+					case DumpType.Object:
+						SkipObject();
+						break;
+				}
 			}
 		}
 

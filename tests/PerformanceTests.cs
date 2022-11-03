@@ -1,8 +1,4 @@
-﻿using System.Diagnostics;
-
-using Google.Protobuf;
-
-using protodump;
+﻿using Google.Protobuf;
 
 using protodumplib;
 

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "protodumpgen": {
+      "commandName": "Project",
+      "commandLineArgs": "--file H:\\src\\sboothza\\ProtoDump\\SharedClasses\\Person_v2.proto --output-folder H:\\src\\sboothza\\ProtoDump\\SharedClasses\\gen2 --namespace prototest --language C#"
+    }
+  }
+}

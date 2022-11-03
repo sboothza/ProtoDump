@@ -49,10 +49,14 @@ namespace protodumplib
 	public class Person_v2 : Person
 	{
 		public new Address Address { get; set; }
+		public List<string> Phone { get; set; }
+		public List<Address> Addresses { get; set; }
 
 		public Person_v2()
 		{
 			Address = new Address();
+			Phone = new List<string>();
+			Addresses = new List<Address>();
 		}
 
 		public override void Deserialize(DumpCodec codec, DumpField field)
@@ -69,6 +73,12 @@ namespace protodumplib
 				case 6:
 					codec.Deserialize(Address);
 					break;
+				case 7:
+					codec.ReadList<string>(Phone);
+					break;
+				case 8:
+					codec.ReadList<Address>(Addresses);
+					break;
 				default:
 					codec.SkipField(field.FieldType);
 					break;
@@ -82,6 +92,8 @@ namespace protodumplib
 			codec.WriteInt(3, Id);
 			codec.WriteLong(4, Birthdate.Ticks);
 			codec.WriteObject(6, Address);
+			codec.WriteList(7, Phone);
+			codec.WriteList(8, Addresses);
 			codec.WriteEnd();
 		}
 	}

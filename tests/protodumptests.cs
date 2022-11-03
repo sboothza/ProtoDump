@@ -149,6 +149,41 @@ public class Tests
 		});
 	}
 
+	[Test]
+	public void TestList()
+	{
+		var person = new Person_v2
+		{
+			Name = "Stephen",
+			Surname = "Booth",
+			Id = 123,
+			Birthdate = DateTime.Parse("1974/03/15"),
+			Address = new Address { Street = "24 Mountain Road", Suburb = "Roundhay", City = "Somerset West", Code = "7130" },
+			Phone = new List<string> { "123", "456", "789" },
+			Addresses = new List<Address> {
+				new Address {
+					Street = "24 Mountain Road",
+					Suburb = "Roundhay", City = "Somerset West", Code = "7130" }, new Address { Street = "25 Mountain Road", Suburb = "Roundhay", City = "Somerset West", Code = "7130" }, new Address { Street = "26 Mountain Road", Suburb = "Roundhay", City = "Somerset West", Code = "7130" } },
+		};
+
+		var codec = new DumpCodec();
+		var data = codec.Serialize(person);
+
+		codec = new DumpCodec(data);
+		var p = new Person_v2();
+		codec.Deserialize(p);
+		Console.WriteLine($"Size: {data.Length}");
+		Assert.Multiple(() =>
+		{
+			Assert.That(p.Name, Is.EqualTo("Stephen"));
+			Assert.That(p.Surname, Is.EqualTo("Booth"));
+			Assert.That(p.Id, Is.EqualTo(123));
+			Assert.That(p.Birthdate, Is.EqualTo(DateTime.Parse("1974/03/15")));
+			Assert.That(p.Address.Street, Is.EqualTo("24 Mountain Road"));
+			Assert.That(p.Phone[1], Is.EqualTo("456"));
+			Assert.That(p.Addresses[1].Street, Is.EqualTo("25 Mountain Road"));
+		});
+	}
 
 
 	[Test]
@@ -195,6 +230,64 @@ public class Tests
 		stream.Seek(0, SeekOrigin.Begin);
 
 		PersonProto_v2 p = PersonProto_v2.Parser.ParseFrom(stream);
+		Assert.Multiple(() =>
+		{
+			Assert.That(p.Name, Is.EqualTo("Stephen"));
+			Assert.That(p.Surname, Is.EqualTo("Booth"));
+			Assert.That(p.Id, Is.EqualTo(123));
+			Assert.That(p.Birthdate, Is.EqualTo(DateTime.Parse("1974/03/15").Ticks));
+			Assert.That(p.Address.Street, Is.EqualTo("24 Mountain Road"));
+		});
+	}
+
+	[Test]
+	public void TestGenerated()
+	{
+		var person = new prototest.PersonProto
+		{
+			Name = "Stephen",
+			Surname = "Booth",
+			Id = 123,
+			Birthdate = DateTime.Parse("1974/03/15").Ticks,
+			Address = "24 Mountain Road, Roundhay, Somerset West"
+		};
+
+		var codec = new DumpCodec();
+		var data = codec.Serialize(person);
+
+		codec = new DumpCodec(data);
+		var p = new prototest.PersonProto();
+		codec.Deserialize(p);
+		Console.WriteLine($"Size: {data.Length}");
+		Assert.Multiple(() =>
+		{
+			Assert.That(p.Name, Is.EqualTo("Stephen"));
+			Assert.That(p.Surname, Is.EqualTo("Booth"));
+			Assert.That(p.Id, Is.EqualTo(123));
+			Assert.That(p.Birthdate, Is.EqualTo(DateTime.Parse("1974/03/15").Ticks));
+			Assert.That(p.Address, Is.EqualTo("24 Mountain Road, Roundhay, Somerset West"));
+		});
+	}
+
+	[Test]
+	public void TestGenerated_v2()
+	{
+		var person = new prototest.PersonProto_v2
+		{
+			Name = "Stephen",
+			Surname = "Booth",
+			Id = 123,
+			Birthdate = DateTime.Parse("1974/03/15").Ticks,
+			Address = new prototest.AddressProto { Street = "24 Mountain Road", Suburb = "Roundhay", City = "Somerset West", Code = "7130" }
+		};
+
+		var codec = new DumpCodec();
+		var data = codec.Serialize(person);
+
+		codec = new DumpCodec(data);
+		var p = new prototest.PersonProto_v2();
+		codec.Deserialize(p);
+		Console.WriteLine($"Size: {data.Length}");
 		Assert.Multiple(() =>
 		{
 			Assert.That(p.Name, Is.EqualTo("Stephen"));
