@@ -6,5 +6,4 @@ message PersonProto {
     int32 Id = 3;
     int64 Birthdate = 4;
     string Address = 5;
-
 }

@@ -13,5 +13,4 @@ message PersonProto_v2 {
     int32 Id = 3;
     int64 Birthdate = 4;
     AddressProto Address = 6;
-
 }

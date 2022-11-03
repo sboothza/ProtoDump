@@ -57,13 +57,11 @@ public class Tests
 		codec.Deserialize(p);
 		Assert.Multiple(() =>
 		{
-			Assert.That(p.Name, Is.EqualTo(person.Name));
-			Assert.That(p.Surname, Is.EqualTo(person.Surname));
-			Assert.That(p.Id, Is.EqualTo(person.Id));
-			Assert.That(p.Birthdate, Is.EqualTo(person.Birthdate));
-			Assert.That(p.Address, Is.EqualTo(person.Address));
-			Assert.That(p.Name, Is.Not.Empty);
-			Assert.That(p.Address, Is.Not.Empty);
+			Assert.That(p.Name, Is.EqualTo("Stephen"));
+			Assert.That(p.Surname, Is.EqualTo("Booth"));
+			Assert.That(p.Id, Is.EqualTo(123));
+			Assert.That(p.Birthdate, Is.EqualTo(DateTime.Parse("1974/03/15")));
+			Assert.That(p.Address, Is.EqualTo("24 Mountain Road, Roundhay, Somerset West"));
 		});
 	}
 
@@ -88,11 +86,10 @@ public class Tests
 		Console.WriteLine(p.Address.Street);
 		Assert.Multiple(() =>
 		{
-			Assert.That(p.Name, Is.EqualTo(person.Name));
-			Assert.That(p.Surname, Is.EqualTo(person.Surname));
-			Assert.That(p.Id, Is.EqualTo(person.Id));
-			Assert.That(p.Birthdate, Is.EqualTo(person.Birthdate));
-			Assert.That(p.Name, Is.Not.Empty);
+			Assert.That(p.Name, Is.EqualTo("Stephen"));
+			Assert.That(p.Surname, Is.EqualTo("Booth"));
+			Assert.That(p.Id, Is.EqualTo(123));
+			Assert.That(p.Birthdate, Is.EqualTo(DateTime.Parse("1974/03/15")));
 		});
 	}
 
@@ -112,16 +109,14 @@ public class Tests
 		var data = codec.Serialize(person);
 
 		codec = new DumpCodec(data);
-		var p = new Person_v2();
+		var p = new Person();
 		codec.Deserialize(p);
 		Assert.Multiple(() =>
 		{
-			Assert.That(p.Name, Is.EqualTo(person.Name));
-			Assert.That(p.Surname, Is.EqualTo(person.Surname));
-			Assert.That(p.Id, Is.EqualTo(person.Id));
-			Assert.That(p.Birthdate, Is.EqualTo(person.Birthdate));
-			Assert.That(p.Name, Is.Not.Empty);
-			Assert.That(p.Address.Street, Is.Not.Empty);
+			Assert.That(p.Name, Is.EqualTo("Stephen"));
+			Assert.That(p.Surname, Is.EqualTo("Booth"));
+			Assert.That(p.Id, Is.EqualTo(123));
+			Assert.That(p.Birthdate, Is.EqualTo(DateTime.Parse("1974/03/15")));
 		});
 	}
 
@@ -146,13 +141,11 @@ public class Tests
 		Console.WriteLine($"Size: {data.Length}");
 		Assert.Multiple(() =>
 		{
-			Assert.That(p.Name, Is.EqualTo(person.Name));
-			Assert.That(p.Surname, Is.EqualTo(person.Surname));
-			Assert.That(p.Id, Is.EqualTo(person.Id));
-			Assert.That(p.Birthdate, Is.EqualTo(person.Birthdate));
-			Assert.That(p.Address.Street, Is.EqualTo(person.Address.Street));
-			Assert.That(p.Name, Is.Not.Empty);
-			Assert.That(p.Address.Street, Is.Not.Empty);
+			Assert.That(p.Name, Is.EqualTo("Stephen"));
+			Assert.That(p.Surname, Is.EqualTo("Booth"));
+			Assert.That(p.Id, Is.EqualTo(123));
+			Assert.That(p.Birthdate, Is.EqualTo(DateTime.Parse("1974/03/15")));
+			Assert.That(p.Address.Street, Is.EqualTo("24 Mountain Road"));
 		});
 	}
 
@@ -177,13 +170,11 @@ public class Tests
 		PersonProto p = PersonProto.Parser.ParseFrom(stream);
 		Assert.Multiple(() =>
 		{
-			Assert.That(p.Name, Is.EqualTo(person.Name));
-			Assert.That(p.Surname, Is.EqualTo(person.Surname));
-			Assert.That(p.Id, Is.EqualTo(person.Id));
-			Assert.That(p.Birthdate, Is.EqualTo(person.Birthdate));
-			Assert.That(p.Address, Is.EqualTo(person.Address));
-			Assert.That(p.Name, Is.Not.Empty);
-			Assert.That(p.Address, Is.Not.Empty);
+			Assert.That(p.Name, Is.EqualTo("Stephen"));
+			Assert.That(p.Surname, Is.EqualTo("Booth"));
+			Assert.That(p.Id, Is.EqualTo(123));
+			Assert.That(p.Birthdate, Is.EqualTo(DateTime.Parse("1974/03/15").Ticks));
+			Assert.That(p.Address, Is.EqualTo("24 Mountain Road, Roundhay, Somerset West"));
 		});
 	}
 
@@ -206,15 +197,12 @@ public class Tests
 		PersonProto_v2 p = PersonProto_v2.Parser.ParseFrom(stream);
 		Assert.Multiple(() =>
 		{
-			Assert.That(p.Name, Is.EqualTo(person.Name));
-			Assert.That(p.Surname, Is.EqualTo(person.Surname));
-			Assert.That(p.Id, Is.EqualTo(person.Id));
-			Assert.That(p.Birthdate, Is.EqualTo(person.Birthdate));
-			Assert.That(p.Address.Street, Is.EqualTo(person.Address.Street));
-			Assert.That(p.Name, Is.Not.Empty);
-			Assert.That(p.Address.Street, Is.Not.Empty);
+			Assert.That(p.Name, Is.EqualTo("Stephen"));
+			Assert.That(p.Surname, Is.EqualTo("Booth"));
+			Assert.That(p.Id, Is.EqualTo(123));
+			Assert.That(p.Birthdate, Is.EqualTo(DateTime.Parse("1974/03/15").Ticks));
+			Assert.That(p.Address.Street, Is.EqualTo("24 Mountain Road"));
 		});
 	}
-
 
 }

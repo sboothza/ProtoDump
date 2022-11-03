@@ -10,24 +10,27 @@ namespace protodump
 		public DateTime Birthdate { get; set; }
 		public string Address { get; set; }
 
-		public override void Deserialize(DumpCodec codec,IDumpField field)
+		public override void Deserialize(DumpCodec codec, DumpField field)
 		{
 			switch (field.FieldNo)
 			{
 				case 1:
-					Name = ((DumpFieldString)field).Value;
+					Name = codec.ReadString();
 					break;
 				case 2:
-					Surname = ((DumpFieldString)field).Value;
+					Surname = codec.ReadString();
 					break;
 				case 3:
-					Id = ((DumpFieldInt)field).Value;
+					Id = codec.ReadInt();
 					break;
 				case 4:
-					Birthdate = new DateTime(((DumpFieldLong)field).Value);
+					Birthdate = new DateTime(codec.ReadLong());
 					break;
 				case 5:
-					Address = ((DumpFieldString)field).Value;
+					Address = codec.ReadString();
+					break;
+				default:
+					codec.SkipField(field.FieldType);
 					break;
 			}
 		}
@@ -43,4 +46,3 @@ namespace protodump
 		}
 	}
 }
-

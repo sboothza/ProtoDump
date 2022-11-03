@@ -1,4 +1,6 @@
-﻿using Google.Protobuf;
+﻿using System.Diagnostics;
+
+using Google.Protobuf;
 
 using protodump;
 
@@ -9,7 +11,7 @@ namespace tests
 	[TestFixture]
 	public class PerformanceTests
 	{
-		private const int LOOPS = 100000;
+		private const int LOOPS = 1000000;
 
 		[Test]
 		public void TestSerializePerformance()
@@ -48,10 +50,14 @@ namespace tests
 
 			var codec = new DumpCodec();
 			var data = codec.Serialize(person);
+			var p = new Person_v2();
+			codec.Init(data);
+			codec.Deserialize(p);
+
 			var start = DateTime.Now;
 			for (var i = 0; i < LOOPS; i++)
 			{
-				var p = new Person_v2();
+				p = new Person_v2();
 				codec.Init(data);
 				codec.Deserialize(p);
 			}

@@ -207,22 +207,13 @@ namespace protodump
 			return this;
 		}
 
-		private IDumpField ReadField()
+		private DumpField ReadField()
 		{
-			var fieldNo = ReadByte();
-			if (fieldNo == 0xff)
-				return null;
-
-			return (DumpType)ReadByte() switch
-			{
-				DumpType.Double => new DumpFieldDouble(fieldNo, ReadDouble()),
-				DumpType.Byte => new DumpFieldByte(fieldNo, ReadByte()),
-				DumpType.Int => new DumpFieldInt(fieldNo, ReadInt()),
-				DumpType.Long => new DumpFieldLong(fieldNo, ReadLong()),
-				DumpType.String => new DumpFieldString(fieldNo, ReadString()),
-				DumpType.Object => new DumpFieldObject(fieldNo, ReadObject()),
-				_ => null,
-			};
+			var field = new DumpField();
+			field.FieldNo = ReadByte();
+			if (field.FieldNo != 0xff)
+				field.FieldType = (DumpType)ReadByte();
+			return field;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -314,19 +305,37 @@ namespace protodump
 			return Encoding.ASCII.GetString(data);
 		}
 
-		public DumpObject ReadObject()
+		public void SkipField(DumpType fieldType)
 		{
-			var obj = new DumpObject();
-			ReadObject(obj);
-			return obj;
+			switch (fieldType)
+			{
+				case DumpType.Double:
+					ReadDouble();
+					break;
+				case DumpType.Byte:
+					ReadByte();
+					break;
+				case DumpType.Int:
+					ReadInt();
+					break;
+				case DumpType.Long:
+					ReadLong();
+					break;
+				case DumpType.String:
+					ReadString();
+					break;
+				case DumpType.Object:
+					SkipObject();
+					break;
+			}
 		}
 
-		public void ReadObject(DumpObject obj)
+		public void SkipObject()
 		{
-			var field = ReadField();
-			while (field != null)
+			DumpField field = ReadField();
+			while (field.FieldNo != 0xff)
 			{
-				obj.AddField(field);
+				SkipField(field.FieldType);
 				field = ReadField();
 			}
 		}
@@ -334,22 +343,11 @@ namespace protodump
 		public void Deserialize(Dumpable obj)
 		{
 			var field = ReadField();
-			while (field != null)
+			while (field.FieldNo != 0xff)
 			{
 				obj.Deserialize(this, field);
 				field = ReadField();
 			}
-
-			//var dumpObj = new DumpObject();
-			//ReadObject(dumpObj);
-			//foreach (var field in dumpObj)
-			//	obj.Deserialize(this, field);
-		}
-
-		public void Deserialize(Dumpable obj, DumpObject dumpObj)
-		{
-			foreach (var field in dumpObj)
-				obj.Deserialize(this, field);
 		}
 	}
 }

@@ -1,7 +1,5 @@
 ﻿using protodump;
 
-
-
 namespace protodumplib
 {
 	public class Address : Dumpable
@@ -11,21 +9,24 @@ namespace protodumplib
 		public string City { get; set; }
 		public string Code { get; set; }
 
-		public override void Deserialize(DumpCodec codec, IDumpField field)
+		public override void Deserialize(DumpCodec codec, DumpField field)
 		{
 			switch (field.FieldNo)
 			{
 				case 1:
-					Street = ((DumpFieldString)field).Value;
+					Street = codec.ReadString();
 					break;
 				case 2:
-					Suburb = ((DumpFieldString)field).Value;
+					Suburb = codec.ReadString();
 					break;
 				case 3:
-					City = ((DumpFieldString)field).Value;
+					City = codec.ReadString();
 					break;
 				case 4:
-					Code = ((DumpFieldString)field).Value;
+					Code = codec.ReadString();
+					break;
+				default:
+					codec.SkipField(field.FieldType);
 					break;
 			}
 		}
@@ -54,7 +55,7 @@ namespace protodumplib
 			Address = new Address();
 		}
 
-		public override void Deserialize(DumpCodec codec, IDumpField field)
+		public override void Deserialize(DumpCodec codec, DumpField field)
 		{
 			switch (field.FieldNo)
 			{
@@ -66,8 +67,10 @@ namespace protodumplib
 					base.Deserialize(codec, field);
 					break;
 				case 6:
-					var addr = ((DumpFieldObject)field).Value;
-					codec.Deserialize(Address, addr);
+					codec.Deserialize(Address);
+					break;
+				default:
+					codec.SkipField(field.FieldType);
 					break;
 			}
 		}
@@ -78,10 +81,8 @@ namespace protodumplib
 			codec.WriteString(2, Surname);
 			codec.WriteInt(3, Id);
 			codec.WriteLong(4, Birthdate.Ticks);
-			//codec.WriteString(5, Address.ToString());
 			codec.WriteObject(6, Address);
 			codec.WriteEnd();
 		}
 	}
 }
-

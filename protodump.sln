@@ -1,13 +1,17 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 25.0.1703.8
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32922.545
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "protodumplib", "protodumplib\protodumplib.csproj", "{5F3E71D8-F5A3-4594-9224-98B5CFDC64CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "protodumplib", "protodumplib\protodumplib.csproj", "{5F3E71D8-F5A3-4594-9224-98B5CFDC64CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tests", "tests\tests.csproj", "{D4421B89-CFBF-4677-9C36-4C67EC4AFEB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tests", "tests\tests.csproj", "{D4421B89-CFBF-4677-9C36-4C67EC4AFEB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedClasses", "SharedClasses\SharedClasses.csproj", "{73B88839-C270-484F-936E-3D2E6F272013}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedClasses", "SharedClasses\SharedClasses.csproj", "{73B88839-C270-484F-936E-3D2E6F272013}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D577D044-907E-40B8-97A2-02A6B81BD7DA}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2F8D8593-E11F-461D-9288-AF67449B6572}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2F8D8593-E11F-461D-9288-AF67449B6572}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2F8D8593-E11F-461D-9288-AF67449B6572}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2F8D8593-E11F-461D-9288-AF67449B6572}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5F3E71D8-F5A3-4594-9224-98B5CFDC64CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5F3E71D8-F5A3-4594-9224-98B5CFDC64CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F3E71D8-F5A3-4594-9224-98B5CFDC64CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
