@@ -56,5 +56,10 @@ I used `PersonProto_v2` for the performance testing.
 `565ms`
 
 
+## Conclusion
 
+This thing isn't even remotely optimized.  In fact there are some weird parts that I want to make go away.  Just a few tweaks should make this crazy fast.
+
+Next project - wrap this in a function that I can DLLExport for use everywhere.
+Maybe rewrite in C - or Rust
 
