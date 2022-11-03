@@ -1,5 +1,4 @@
-﻿using System;
-namespace protodump
+﻿namespace protodump
 {
     public enum DumpType
     {
@@ -9,7 +8,7 @@ namespace protodump
         Int = 3,        //32bit int
         Long = 4,       //64bit int
         String = 5,     //pascal string        
-        Object=7
+        Object = 7
     }
 }
 
