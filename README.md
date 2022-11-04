@@ -72,3 +72,7 @@ I changed the PersonProto_v2 to contain a list, so it's not the same as for the 
 I did optimize 1 or 2 things - it originally used generics, but I found it was noticably quicker to do it the hard way.  
 So that is an interesting observation for future use - generics have a performance penalty.  
 I also added an inline directive to the low-level functions.  This gave about a 10% performance boost.
+
+I also added a C# generator - uses proto files, works kinda like protoc: 
+
+`protodumpgen --file Person_v2.proto --output-folder ../SharedClasses/gen2 --namespace prototest --language C#`

@@ -1,14 +1,14 @@
 ﻿namespace protodumpgen
 {
-	public class CSGenerator
+	public static class CSGenerator
 	{
-		private const string MessageTemplate = "using protodumplib;\r\nnamespace %namespace%\r\n{\r\n\tpublic class %message% : Dumpable\r\n\t{\r\n%fielddefinitions%\r\n\t\tpublic %message%()\r\n\t\t{\r\n\t\t\t%constructors%\r\n\t\t}\r\n\r\n\t\tpublic override void Deserialize(DumpCodec codec, DumpField field)\r\n\t\t{\r\n\t\t\tswitch (field.FieldNo)\r\n\t\t\t{\r\n%fielddeserialize%\r\n\t\t\t\tdefault:\r\n\t\t\t\t\tcodec.SkipField(field.FieldType);\r\n\t\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\tpublic override void Serialize(DumpCodec codec)\r\n\t\t{\r\n%fieldserialize%\r\n\t\t\tcodec.WriteEnd();\r\n\t\t}\r\n\t}\r\n}";
-		private const string FieldDefinitionTemplate = "\t\tpublic %type% %name% { get; set; }\r\n";
-		private const string FieldDeserializeTemplate = "\t\t\t\tcase %fieldno%:\r\n\t\t\t\t\t%name% = codec.%reader%();\r\n\t\t\t\t\tbreak;\r\n";
-		private const string ObjectDeSerializeTemplate = "\t\t\t\tcase %fieldno%:\r\n\t\t\t\t\tcodec.Deserialize(%name%);\r\n\t\t\t\t\tbreak;\r\n";
-		private const string FieldSerializeTemplate = "\t\t\tcodec.%writer%(%fieldno%, %name%);\r\n";
-		private const string ObjectSerializeTemplate = "\t\t\tcodec.WriteObject(%fieldno%, %name%);\r\n";
-		private const string FieldConstructorTemplate = "%name% = new %type%();\r\n";
+		private const string MESSAGETEMPLATE = "using protodumplib;\r\nnamespace %namespace%\r\n{\r\n\tpublic partial class %message% : Dumpable\r\n\t{\r\n%fielddefinitions%\r\n\t\tpublic %message%()\r\n\t\t{\r\n\t\t\t%constructors%\r\n\t\t}\r\n\r\n\t\tpublic override void Deserialize(DumpCodec codec, DumpField field)\r\n\t\t{\r\n\t\t\tswitch (field.FieldNo)\r\n\t\t\t{\r\n%fielddeserialize%\r\n\t\t\t\tdefault:\r\n\t\t\t\t\tcodec.SkipField(field.FieldType);\r\n\t\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\tpublic override void Serialize(DumpCodec codec)\r\n\t\t{\r\n%fieldserialize%\r\n\t\t\tcodec.WriteEnd();\r\n\t\t}\r\n\t}\r\n}";
+		private const string FIELDDEFINITIONTEMPLATE = "\t\tpublic %type% %name% { get; set; }\r\n";
+		private const string FIELDDESERIALIZETEMPLATE = "\t\t\t\tcase %fieldno%:\r\n\t\t\t\t\t%name% = codec.%reader%();\r\n\t\t\t\t\tbreak;\r\n";
+		private const string OBJECTDESERIALIZETEMPLATE = "\t\t\t\tcase %fieldno%:\r\n\t\t\t\t\tcodec.Deserialize(%name%);\r\n\t\t\t\t\tbreak;\r\n";
+		private const string FIELDSERIALIZETEMPLATE = "\t\t\tcodec.%writer%(%fieldno%, %name%);\r\n";
+		private const string OBJECTSERIALIZETEMPLATE = "\t\t\tcodec.WriteObject(%fieldno%, %name%);\r\n";
+		private const string FIELDCONSTRUCTORTEMPLATE = "%name% = new %type%();\r\n";
 
 		public static void Generate(string protoFilename, string outputFolder, string nameSpace)
 		{
@@ -32,40 +32,39 @@
 
 			foreach (var field in message.Fields)
 			{
-				fieldDefinitions += FieldDefinitionTemplate
+				fieldDefinitions += FIELDDEFINITIONTEMPLATE
 					.Replace("%type%", field.Type.GetCSType(messages))
 					.Replace("%name%", field.Name);
 
 				if (field.Type.IsCustomType(messages))
 				{
-					fieldSerializers += ObjectSerializeTemplate
+					fieldSerializers += OBJECTSERIALIZETEMPLATE
 						.Replace("%name%", field.Name)
 						.Replace("%fieldno%", field.FieldNo.ToString());
 
-					fieldDeserializers += ObjectDeSerializeTemplate
+					fieldDeserializers += OBJECTDESERIALIZETEMPLATE
 						.Replace("%name%", field.Name)
 						.Replace("%fieldno%", field.FieldNo.ToString());
 
-					constructors += FieldConstructorTemplate
+					constructors += FIELDCONSTRUCTORTEMPLATE
 						.Replace("%name%", field.Name)
 						.Replace("%type%", field.Type);
 				}
 				else
 				{
-					fieldSerializers += FieldSerializeTemplate
+					fieldSerializers += FIELDSERIALIZETEMPLATE
 						.Replace("%writer%", field.Type.GetCSWriter(messages))
 						.Replace("%name%", field.Name)
 						.Replace("%fieldno%", field.FieldNo.ToString());
 
-					fieldDeserializers += FieldDeserializeTemplate
+					fieldDeserializers += FIELDDESERIALIZETEMPLATE
 						.Replace("%reader%", field.Type.GetCSReader(messages))
 						.Replace("%name%", field.Name)
 						.Replace("%fieldno%", field.FieldNo.ToString());
 				}
-
 			}
 
-			var msg = MessageTemplate
+			var msg = MESSAGETEMPLATE
 				.Replace("%namespace%", nameSpace)
 				.Replace("%message%", message.Name)
 				.Replace("%fielddefinitions%", fieldDefinitions)
@@ -73,7 +72,7 @@
 				.Replace("%fielddeserialize%", fieldDeserializers)
 				.Replace("%fieldserialize%", fieldSerializers);
 
-			using (StreamWriter writer = new StreamWriter(Path.Combine(outputFolder, message.Name + ".cs")))
+			using (var writer = new StreamWriter(Path.Combine(outputFolder, message.Name + ".cs")))
 			{
 				writer.Write(msg);
 			}
@@ -143,7 +142,12 @@
 						break;
 				}
 				if (type != nameof(ProtoType.UNKNOWN))
-					msg.Fields.Add(new Field { Type = type, Name = name, FieldNo = fieldNo });
+					msg.Fields.Add(new Field
+					{
+						Type = type,
+						Name = name,
+						FieldNo = fieldNo
+					});
 			}
 			return msg;
 		}
