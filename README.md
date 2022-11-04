@@ -6,6 +6,8 @@ Payload is 20% bigger, but it's about 2x faster, so who cares.
 # Performance Tests 
 *on M1 MacBook Pro*
 
+*Looping 1 million times*
+
 **91 byte object graph in my lib**
 
 **79 byte identical object graph in protobuf**
@@ -58,8 +60,15 @@ I used `PersonProto_v2` for the performance testing.
 
 ## Conclusion
 
-This thing isn't even remotely optimized.  In fact there are some weird parts that I want to make go away.  Just a few tweaks should make this crazy fast.
+This thing isn't well optimized.
+In fact there are some weird parts that I want to make go away.
+Just a few tweaks should make this crazy fast.
 
 Next project - wrap this in a function that I can DLLExport for use everywhere.
 Maybe rewrite in C - or Rust
 
+##### Edit:
+I changed the PersonProto_v2 to contain a list, so it's not the same as for the original test.  
+I did optimize 1 or 2 things - it originally used generics, but I found it was noticably quicker to do it the hard way.  
+So that is an interesting observation for future use - generics have a performance penalty.  
+I also added an inline directive to the low-level functions.  This gave about a 10% performance boost.
